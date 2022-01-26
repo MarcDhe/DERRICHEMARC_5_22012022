@@ -33,7 +33,7 @@ fetch('http://localhost:3000/api/products')
     console.log(result[0]); // test pour voir l'affichage si nous avons les bonne donné
 
     for(let i in result){ // bonne maniere de faire
-
+      
       //crée des Elements
       let linkArticle = document.createElement("a");
       let detailArticle = document.createElement("article");
