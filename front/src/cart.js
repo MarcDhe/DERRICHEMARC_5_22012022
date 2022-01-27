@@ -1,8 +1,10 @@
 // localStorage.clear();
+
+
 var cartJSON = localStorage.getItem('cart');
 var cart = JSON.parse(cartJSON);
 
-console.log(cart);
+console.log("cart", cart);
 
 let priceTotal = 0;
 let quantityTotal = 0;
@@ -133,21 +135,29 @@ fetch('http://localhost:3000/api/products')
     //ajout prix et quantité
     document.getElementById('totalQuantity').innerText = quantityTotal;
     document.getElementById('totalPrice').innerText = priceTotal;
+
+    // var deleteBtn = document.getElementsByClassName("deleteItem");
+    // for (let i in deleteBtn){
+    // console.log('valeur deleteBtn[1]', deleteBtn[1]);
+    // console.log('parent de ', deleteBtn[1].parentElement);
+    // // deleteBtn.addEventListener('click',deleteStuff);
+    // }
+  
     
   });
 
-//   const deleteStuff = () => {
-//     console.log('tata')
-//     var elt =  deleteBtn.parentElement;
-//     console.log("++++++");
-//     console.log(elt.dataset.id);
-//     console.log("++++++");
+  const deleteStuff = () => {
+    console.log('tata')
+    var elt =  deleteBtn.parentElement;
+    console.log("++++++");
+    console.log(elt.dataset.id);
+    console.log("++++++");
 
-//   };
+  };
 
 // // // ne s'affiche pas 
-// //   var deleteBtn = document.getElementsByClassName("deleteItem");
-// //   for (let i in deleteBtn){
-// //   console.log('valeur deleteBtn', deleteBtn);
-// //   deleteBtn.addEventListener('click',deleteStuff);
-// //   }
+  // var deleteBtn = document.getElementsByClassName("deleteItem");
+  // for (let i in deleteBtn){
+  // console.log('valeur deleteBtn', deleteBtn);
+  // deleteBtn.addEventListener('click',deleteStuff);
+  // }

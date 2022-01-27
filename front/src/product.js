@@ -1,14 +1,17 @@
+// localStorage.clear();
 // delcare la variable iDprodcut et autre
 let idProduct = 0;
+let newCartAdd ;
+let cart = [];
 
-//on veut que si le local storage nexiste pas crée la variable cart 
+//on veut que si le local storage si il n'existe pas crée la variable cart 
 // et si elle existe l'ectraire de son format JSON
-if(localStorage.cart == undefined){
-  var cart = [];
-  console.log("pk", cart);
-}else{ // obligé de faire sinon cart nest pas considerer comme un tableau et on ne peut pas .push(newAddCart)
-  var preCart=localStorage.getItem('cart');
-  var cart = JSON.parse(preCart);
+if(localStorage.cart !== undefined){
+  let preCart=localStorage.getItem('cart');
+  cart = JSON.parse(preCart);
+  console.log('cart existe :', cart)
+}else{
+  console.log("cart existe pas")
 }
 
 
@@ -62,9 +65,9 @@ const addColors = (tableau) => {
 }
 
 
-
-// nous appellons L'api pour recuperer la base de donner
-fetch('http://localhost:3000/api/products')
+// nous appellons L'api pour recuperer la donné du produit grace a idProduct
+//modif faite au lieu de recup l'integralité de la base et de comparer
+fetch(`http://localhost:3000/api/products/${idProduct}`)
   .then(function(res) {
     if (res.ok){
       return res.json();
@@ -77,16 +80,8 @@ fetch('http://localhost:3000/api/products')
   
   .then(function(result){ 
     console.log(result);
-    //on va comparer tout les id et en fonction on affichera celui ==
-    for(let i in result){
-      if(idProduct == result[i]._id){
-        console.log('same');
-        addHTML(result[i]);
-        addColors(result[i].colors); // !!attention notation  variable du tableau tres importante
-      }else{
-        console.log('note same');
-      };
-    }
+    addHTML(result);
+    addColors(result.colors);
   });
 
 
@@ -115,78 +110,49 @@ const verifAddCart = (valueQuantity, valueColors) => {
     console.log(validSend);
 
  
- // ###GESTION VALIDATION DONNEES####
+    //GESTION VALIDATION DONNEES SAISIE
 
-    // annulatiojn du remplissage si: + message erreur
-    if(validSend == false){ 
-      //creation message erreur
-      errMsg.style.color = "red";
-      errMsg.textContent = "Veuillez selection une couleur et/ou une quantité" // voir pour afficher message d'erreur;
-      return 0;
-    }else{
-     errMsg.textContent='Article(s) ajouter au panier';
-     errMsg.style.color = "green";
-    }
-
-    // //id
-    // localStorage.setItem("idProduct", idProduct);
-    // console.log("=====");
-    // console.log(localStorage.idProduct);
-    // console.log("=====");
-
-    // // couleur // +allColors.options[0].value); pour la  verif !=
-    // localStorage.setItem("colorsProduct", colorsChoose);
-    // console.log("=====");
-    // console.log('locolCouleur : ' +localStorage.colorsProduct);
-    // console.log("=====");
-    
-
-    // // quantité
-    // localStorage.setItem("quantityProduct", quantityChoose);
-    // console.log("=====");
-    // console.log('localQuantité : ' +localStorage.quantityProduct);
-    // console.log("=====");
-    
-
-    // //TEST STORAGE
-    // console.log('longueur tab', localStorage.length);
-    // localStorage.clear();
-    // localStorage.setItem(`${idProduct}`, [colorsChoose, 5]);
+      // annulatiojn du remplissage si: + message erreur
+      if(validSend == false){ 
+        //creation message erreur
+        errMsg.style.color = "red";
+        errMsg.textContent = "Veuillez selection une couleur et/ou une quantité" // voir pour afficher message d'erreur;
+        return 0;
+      }else{
+      errMsg.textContent='Article(s) ajouter au panier';
+      errMsg.style.color = "green";
+      }
+    //FIN GESTION VALIDATION DONNES SAISIE
   
-    
-    // console.log(localStorage);
+    // DEBUT CONDITION CREATION NOUVELLE OBJ si PAS DE DOUBLONS sinon MODIF QUANTITE
+    newCartAdd = {
+      _id : idProduct,
+      colors : colorsChoose,
+      quantity : quantityChoose
+    };
 
-    // SOURCE du stringfy ++ https://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
-    //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
-   var newCartAdd = {
-     _id : idProduct,
-     colors : colorsChoose,
-     quantity : quantityChoose
-   };
+    let copyExist = false;
 
-  cart.push(newCartAdd);
-
-// nous voulons une premiere boucle qui va lire l'integralité de la cart
-// nous voulons une deuxieme boucle ombriqué dans la premiere qui va elle servir
-// a comparer les cases du tableau entre elle pour supprimer les doublons
-  for( let i in cart){
-    for (let y in cart){
-      if( cart[i]._id == cart[y]._id  && cart[i].colors == cart[y].colors && y>i){
-      console.log('identique');
-      console.log(cart[y]);
-      console.log(cart[i]);
-      console.log('=====');
-
-      cart[i].quantity = parseInt(cart[i].quantity) + parseInt(cart[y].quantity); // convert to string to number https://gomakethings.com/converting-strings-to-numbers-with-vanilla-javascript/
-      console.log('nouvelle quantité : ', cart[i].quantity) // soucis quantity est pas un nombre
-      cart.splice(y); // splice reindex en supprimant, delete supprime la "case" en trop mais case vide
-      console.log('nouveau panier :', cart);
+    for(let i in cart){
+      console.log('err: ',cart[i]._id);
+      if(cart[i]._id == idProduct && cart[i].colors == colorsChoose ){
+        cart[i].quantity = parseInt(cart[i].quantity) + parseInt(quantityChoose);
+        console.log('nouvelle quantité : ', cart[i].quantity);
+        copyExist = true;
       }
     }
-  }
-  
-  console.log('-------');
-  console.log(cart);
+
+    if(copyExist !== true){
+      cart.push(newCartAdd);
+    }
+    // FIN CONDITION DE REMPLISSAGE TABLEAU 
+
+    console.log('-------');
+    console.log(cart);
+    console.log('-------');
+   // SOURCE du stringfyhttps://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
+   //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
+
    var cartJSON = JSON.stringify(cart);
    localStorage.setItem('cart', cartJSON); // ici si pas JSON peu pas LIRE le console.log
    console.log(localStorage.cart)
@@ -194,13 +160,11 @@ const verifAddCart = (valueQuantity, valueColors) => {
 
   }
   
-
- 
-//envoi des donner au localstorage: creation de l'event
-document
-  .getElementById('addToCart')
-  .addEventListener('click',saveCart);
-
+//CREATION EVENEMENT ENVOI DONNEES AU LOCALSTORAGE
+  document
+    .getElementById('addToCart')
+    .addEventListener('click',saveCart);
+// FIN CREATION EVENEMENT ENVOI DONNEES AU LOCALSTORAGE
 
   //vérification des Elements fournis par l'utilisateur
 
