@@ -90,7 +90,7 @@ const newElement = (tab1, tab2) => {
  pCartItemContentSettingsDelete.innerText='Supprimer';
 }
 
-
+// Analyse du panier et de la base de données avec creation des elements en fonction si egalité  
 const comparaisonTableau = (tab1, tab2) => { // tab1 la base de donné
   for (let i in tab1){
     for (let y in tab2){
@@ -123,7 +123,7 @@ fetch('http://localhost:3000/api/products')
   })
   //si erreur
   .catch (function(err) {
-    console.log('Oups, je ne sais pas non plus ce qu il se passe');
+    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
   })
 
   .then(function(result){ // resultat de la Promise
@@ -138,7 +138,7 @@ fetch('http://localhost:3000/api/products')
 
   const deleteStuff = () => {
     console.log('tata')
-    let elt =  deleteBtn.parentElement;
+    var elt =  deleteBtn.parentElement;
     console.log("++++++");
     console.log(elt.dataset.id);
     console.log("++++++");
@@ -146,6 +146,8 @@ fetch('http://localhost:3000/api/products')
   };
 
 // ne s'affiche pas 
-  let deleteBtn = document.getElementsByClassName('deleteItem');
-  console.log('est', deleteBtn)
-  // deleteBtn[0].addEventListener('click',deleteStuff);
+  var deleteBtn = document.getElementsByClassName("deleteItem");
+  for (let i in deleteBtn){
+  console.log('valeur deleteBtn', deleteBtn);
+  deleteBtn.addEventListener('click',deleteStuff);
+  }
