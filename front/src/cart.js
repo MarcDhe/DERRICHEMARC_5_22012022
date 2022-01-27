@@ -136,18 +136,18 @@ fetch('http://localhost:3000/api/products')
     
   });
 
-  const deleteStuff = () => {
-    console.log('tata')
-    var elt =  deleteBtn.parentElement;
-    console.log("++++++");
-    console.log(elt.dataset.id);
-    console.log("++++++");
+//   const deleteStuff = () => {
+//     console.log('tata')
+//     var elt =  deleteBtn.parentElement;
+//     console.log("++++++");
+//     console.log(elt.dataset.id);
+//     console.log("++++++");
 
-  };
+//   };
 
-// ne s'affiche pas 
-  var deleteBtn = document.getElementsByClassName("deleteItem");
-  for (let i in deleteBtn){
-  console.log('valeur deleteBtn', deleteBtn);
-  deleteBtn.addEventListener('click',deleteStuff);
-  }
+// // // ne s'affiche pas 
+// //   var deleteBtn = document.getElementsByClassName("deleteItem");
+// //   for (let i in deleteBtn){
+// //   console.log('valeur deleteBtn', deleteBtn);
+// //   deleteBtn.addEventListener('click',deleteStuff);
+// //   }
