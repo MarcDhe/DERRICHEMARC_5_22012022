@@ -1,68 +1,25 @@
-// var panierJSON = localStorage.getItem('panier');
-// var panier = JSON.parse(panierJSON);
+// localStorage.clear();
+var cartJSON = localStorage.getItem('cart');
+var cart = JSON.parse(cartJSON);
 
-console.log(localStorage.cart);
+console.log(cart);
+// nous voulons une premiere boucle qui va lire l'integralité de la cart
+// nous voulons une deuxieme boucle ombriqué dans la premiere qui va elle servir
+// a comparer les cases du tableau entre elle pour supprimer les doublons
 
-  
-// console.log(localStorage.idProduct);
-// console.log('locolCouleur : ' +localStorage.colorsProduct);
-// console.log('localQuantité : ' +localStorage.quantityProduct);
+// for( let i in cart){
+//     for (let y in cart){
+//       if( cart[i]._id == cart[y]._id  && cart[i].colors == cart[y].colors && y>i){
+//       console.log('identique');
+//       console.log(cart[y]);
+//       console.log(cart[i]);
+//       console.log('=====');
 
-
-
-// let tableauTests = [];
-// let tableauInterieur = ["toutou", "rienrien", 3];
-// tableauTest[0]= tableauInterieur;
-
-// tableauTest[2] = [8, 'bleu', 2];
-
-// console.log(tableauTest[0]);
-
-// console.log('====');
-// console.log(tableauTest[2][0]);
-// console.log('====');
-
-
-// let quant = 10 ;
-// console.log(quant);
-
-// tableauInterieur[2] = tableauInterieur[2] + quant;
-
-// console.log(tableauInterieur[2]);
-
-// console.log(tableauTest[0]);
-
-
-// class Book{
-//   constructor(ID, color , quantity){
-//     this.ID = ID;
-//     this.color = color;
-//     this.quantity = quantity;
-//   }
+//       cart[i].quantity = parseInt(cart[i].quantity) + parseInt(cart[y].quantity); // convert to string to number https://gomakethings.com/converting-strings-to-numbers-with-vanilla-javascript/
+//       console.log('nouvelle quantité : ', cart[i].quantity) // soucis quantity est pas un nombre
+//       cart.splice(y); // splice reindex en supprimant, delete supprime la "case" en trop mais case vide
+//       console.log('nouveau panier :', cart);
+//       }
+//     }
 // }
 
-// let caca = new Book(33, 'bleu', 1);
-
-// tableauTest[1] = caca;
-// console.log(tableauTest);
-
-// let searchId = 8
-// let valid = false
-
-// for( let i in tableauTest){
-//   if (tableauTest[i][0] == searchId && tableauTest[i][1] == 'bleus'){
-//     tableauTest[i][2] += 8; 
-//     console.log('+++++');
-//     console.log(tableauTest[i][2]);
-//     console.log('+++++');
-//     valid = true;
-//   }
-//   console.log(valid);
-// }
-// if(valid == false){
-//   tableauTest.push([42, 'huit', 3]);
-// }
-
-// console.log(tableauTest);
-
-// console.log(localStorage.panier)

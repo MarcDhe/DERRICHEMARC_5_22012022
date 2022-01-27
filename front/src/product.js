@@ -1,6 +1,6 @@
 // delcare la variable iDprodcut et autre
 let idProduct = 0;
-let cart = []; 
+let cart = [];
 
 //creation d'un element pour afficher un message derreur au besoin
 let errMsg = document.createElement("p");
@@ -95,10 +95,10 @@ const verifAddCart = (valueQuantity, valueColors) => {
     let allColors = document.getElementById("colors");
     let colorsChoose = allColors.options[allColors.selectedIndex].value;
     //donnée de la quantité
-    let quantityChoose = document.getElementById("quantity").value; 
+    let quantityChoose = document.getElementById("quantity").value;  // probleme pas un nombre
     // Creation de la condition du formulaire valid
-    let validSend = true;
-
+    let validSend = true; // TEST 
+  
     //verif avant ajout carte
     validSend = verifAddCart(quantityChoose, colorsChoose);
     console.log(validSend);
@@ -144,6 +144,9 @@ const verifAddCart = (valueQuantity, valueColors) => {
   
     
     // console.log(localStorage);
+
+    // SOURCE du stringfy ++ https://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
+    //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
    let newCartAdd = {
      _id : idProduct,
      colors : colorsChoose,
@@ -152,8 +155,28 @@ const verifAddCart = (valueQuantity, valueColors) => {
 
   cart.push(newCartAdd);
 
+// nous voulons une premiere boucle qui va lire l'integralité de la cart
+// nous voulons une deuxieme boucle ombriqué dans la premiere qui va elle servir
+// a comparer les cases du tableau entre elle pour supprimer les doublons
+  for( let i in cart){
+    for (let y in cart){
+      if( cart[i]._id == cart[y]._id  && cart[i].colors == cart[y].colors && y>i){
+      console.log('identique');
+      console.log(cart[y]);
+      console.log(cart[i]);
+      console.log('=====');
+
+      cart[i].quantity = parseInt(cart[i].quantity) + parseInt(cart[y].quantity); // convert to string to number https://gomakethings.com/converting-strings-to-numbers-with-vanilla-javascript/
+      console.log('nouvelle quantité : ', cart[i].quantity) // soucis quantity est pas un nombre
+      cart.splice(y); // splice reindex en supprimant, delete supprime la "case" en trop mais case vide
+      console.log('nouveau panier :', cart);
+      }
+    }
+  }
+  
+  console.log('-------');
   console.log(cart);
-  let cartJSON = JSON.stringify(cart);
+   var cartJSON = JSON.stringify(cart);
    localStorage.setItem('cart', cartJSON); // ici si pas JSON peu pas LIRE le console.log
    console.log(localStorage.cart)
    console.log("tata", +localStorage.cartJSON);
