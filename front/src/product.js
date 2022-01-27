@@ -1,6 +1,17 @@
 // delcare la variable iDprodcut et autre
 let idProduct = 0;
-let cart = [];
+
+//on veut que si le local storage nexiste pas crée la variable cart 
+// et si elle existe l'ectraire de son format JSON
+if(localStorage.cart == undefined){
+  var cart = [];
+  console.log("pk", cart);
+}else{ // obligé de faire sinon cart nest pas considerer comme un tableau et on ne peut pas .push(newAddCart)
+  var preCart=localStorage.getItem('cart');
+  var cart = JSON.parse(preCart);
+}
+
+
 
 //creation d'un element pour afficher un message derreur au besoin
 let errMsg = document.createElement("p");
@@ -147,7 +158,7 @@ const verifAddCart = (valueQuantity, valueColors) => {
 
     // SOURCE du stringfy ++ https://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
     //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
-   let newCartAdd = {
+   var newCartAdd = {
      _id : idProduct,
      colors : colorsChoose,
      quantity : quantityChoose
