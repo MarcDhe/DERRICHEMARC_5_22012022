@@ -87,6 +87,7 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
 
 //verif des données fournit
 //ATTENTION en faite il faut utilisé des regex
+//EXEMPLE REGEX POUR LA COULEUR ( let reg = new RegExp(/S+V+P//) ) + signifie suivie directement de donc ici S suivie directement de V suivie diredtement de P
 const verifAddCart = (valueQuantity, valueColors) => { 
   if(valueColors == "" || valueQuantity>100 || valueQuantity<1 ){
   return false;
@@ -150,7 +151,9 @@ const verifAddCart = (valueQuantity, valueColors) => {
     console.log('-------');
     console.log(cart);
     console.log('-------');
-   // SOURCE du stringfyhttps://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
+    
+   // SOURCE du stringfy:
+   //https://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
    //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
 
    var cartJSON = JSON.stringify(cart);

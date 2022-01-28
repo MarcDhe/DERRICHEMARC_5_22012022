@@ -1,19 +1,34 @@
 // localStorage.clear();
+let tableauX = [ 3, 3 , 'hit'];
+console.log(tableauX);
+tableauX.splice(1,1);
+console.log(tableauX);
+ 
+let cartJSON = localStorage.getItem('cart');
+let cart = JSON.parse(cartJSON);
 
-
-var cartJSON = localStorage.getItem('cart');
-var cart = JSON.parse(cartJSON);
+// if(cart== null){   //NE MARCHE PAS APRES SUPPRESSION D'ARTICLE CAR cart = [];
+//   console.log('tata');
+//   let emptyCart = document.createElement("p");
+//   document.getElementById('cart__items').appendChild(emptyCart);
+//   emptyCart.innerText = "( Votre Panier est Vide )";
+//   emptyCart.style.textAlign = 'center';
+// }
 
 console.log("cart", cart);
 
 let priceTotal = 0;
 let quantityTotal = 0;
+let prix = 0;
+let validSend = true;
 
 
 
-// creation des éléments
-
+// CREATION ET AJOUT DE NOUVELLE ELEMENT
 const newElement = (tab1, tab2) => {
+
+              //CREATION DES ELEMENTS //
+
   let articleCartItem = document.createElement('article');
 
   let divCartItemImg = document.createElement('div');
@@ -35,89 +50,142 @@ const newElement = (tab1, tab2) => {
   let divCartItemContentSettingsDelete = document.createElement('div');
   let pCartItemContentSettingsDelete = document.createElement('p');
 
-
-  // ajout au HTML
-
-  //article
+            // AJOUT AU HTML DES NOUVEAUX ELEMENTS // 
+  
   document.getElementById('cart__items').appendChild(articleCartItem);
-  //div 1
+  //
   articleCartItem.appendChild(divCartItemImg);
   divCartItemImg.appendChild(imgCartItem);
-  //div 2
+  //
   articleCartItem.appendChild(divCartItemContent);
- //div 2.1
+  //
   divCartItemContent.appendChild(divCartItemContentDescription);
   divCartItemContentDescription.appendChild(titleCartItemContentDescription);
   divCartItemContentDescription.appendChild(pOneCartItemContentDescrpition);
   divCartItemContentDescription.appendChild(pTwoCartItemContentDescrpition);
-  //div 2.2
+  //
   divCartItemContent.appendChild(divCartItemContentSettings);
-  //dive 2.2.1
+  //
   divCartItemContentSettings.appendChild(divCartItemContentSettingsQuantity);
   divCartItemContentSettingsQuantity.appendChild(pCartItemContentSettingsQuantity);
   divCartItemContentSettingsQuantity.appendChild(inputCartItemContentSettingsQuantity);
-  // div 2.2.2
+  //
   divCartItemContentSettings.appendChild(divCartItemContentSettingsDelete);
   divCartItemContentSettingsDelete.appendChild(pCartItemContentSettingsDelete);
   
- // ajout des classes aux Elements crées
+               // AJOUT DE CLASSE(S) AUX ELEMENTS CRÉES // 
 
- articleCartItem.classList.add("cart__item");
- divCartItemImg.classList.add("cart__item__img")
- divCartItemContent.classList.add("cart__item__content");
- divCartItemContentDescription.classList.add("cart__item__content");
- divCartItemContentSettings.classList.add("cart__item__content__settings");
- divCartItemContentSettingsQuantity.classList.add("cart__item__content__settings__quantity");
- inputCartItemContentSettingsQuantity.classList.add("itemQuantity");
- divCartItemContentSettingsDelete.classList.add("cart__item__content__settings__delete");
- pCartItemContentSettingsDelete.classList.add("deleteItem");
+  articleCartItem.classList.add("cart__item");
+  divCartItemImg.classList.add("cart__item__img");
+  divCartItemContent.classList.add("cart__item__content");
+  divCartItemContentDescription.classList.add("cart__item__content");
+  divCartItemContentSettings.classList.add("cart__item__content__settings");
+  divCartItemContentSettingsQuantity.classList.add("cart__item__content__settings__quantity");
+  inputCartItemContentSettingsQuantity.classList.add("itemQuantity");
+  divCartItemContentSettingsDelete.classList.add("cart__item__content__settings__delete");
+  pCartItemContentSettingsDelete.classList.add("deleteItem");
 
- // ajout des valeurs du produit
- articleCartItem.setAttribute("data-id", tab1._id); // important pour le delete
- articleCartItem.setAttribute('data-color', tab2.colors)
+              // REMPLISSAGE AVEC LES VALEURS DU PRODUIT // 
 
- imgCartItem.setAttribute("src", tab1.imageUrl);
- imgCartItem.setAttribute("alt", tab1.altTxt);
+  articleCartItem.setAttribute("data-id", tab1._id); // important pour le delete
+  articleCartItem.setAttribute('data-color', tab2.colors);
+  //
+  imgCartItem.setAttribute("src", tab1.imageUrl);
+  imgCartItem.setAttribute("alt", tab1.altTxt);
+  //
+  titleCartItemContentDescription.innerText = tab1.name;
+  pOneCartItemContentDescrpition.innerText = tab2.colors;
+  pTwoCartItemContentDescrpition.innerText = `${tab1.price} €`;
+  //
+  pCartItemContentSettingsQuantity.innerText = 'Qté : ';
+  inputCartItemContentSettingsQuantity.setAttribute('value', tab2.quantity);
+  inputCartItemContentSettingsQuantity.setAttribute('name', 'itemQuantity');
+  inputCartItemContentSettingsQuantity.setAttribute('min', '1');
+  inputCartItemContentSettingsQuantity.setAttribute('max', '100');
+  //
+  pCartItemContentSettingsDelete.innerText='Supprimer';
 
- titleCartItemContentDescription.innerText = tab1.name;
- pOneCartItemContentDescrpition.innerText = tab2.colors;
- pTwoCartItemContentDescrpition.innerText = `${tab1.price} €`;
- 
- pCartItemContentSettingsQuantity.innerText = 'Qté : ';
- inputCartItemContentSettingsQuantity.setAttribute('value', tab2.quantity);
- inputCartItemContentSettingsQuantity.setAttribute('name', 'itemQuantity');
- inputCartItemContentSettingsQuantity.setAttribute('min', '1');
- inputCartItemContentSettingsQuantity.setAttribute('max', '100');
- 
- pCartItemContentSettingsDelete.innerText='Supprimer';
-}
+                // CREATION ELEMENT ERREUR //
 
-// Analyse du panier et de la base de données avec creation des elements en fonction si egalité  
-const comparaisonTableau = (tab1, tab2) => { // tab1 la base de donné
-  for (let i in tab1){
-    for (let y in tab2){
-      if(tab1[i]._id == tab2[y]._id){
-        console.log("====");
-        console.log("tab1 :", tab1[i]);
-        console.log("tab2", tab2[y]);
+  let errMsg = document.createElement("p");
+  inputCartItemContentSettingsQuantity.parentElement.appendChild(errMsg);
 
-        newElement(tab1[i], tab2[y]);
+               // AJOUT CREATION EVENT //
+  //-->              
+  pCartItemContentSettingsDelete.addEventListener('click', function(){
+    let parent = pCartItemContentSettingsDelete.closest('article'); // https://developer.mozilla.org/fr/docs/Web/API/Element/closest element parent le plus proche etant un article
+    for(let i in cart){
+      if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
+        cart.splice(i,1); // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
 
-        //creation prix et quantité total 
-        priceTotal += (parseInt(tab1[i].price)*(parseInt(tab2[y].quantity)));
-        quantityTotal += parseInt(tab2[y].quantity);
-        console.log('=====');
-        console.log(quantityTotal);
-        console.log(priceTotal);
-        console.log('=====');
-        
-      } 
+        saveOnLocalStorage();
+
+        document
+          .getElementById('cart__items')
+          .removeChild(parent);
+      }
     }
-  }
-};
+  });
+  //<--
+  //-->
+  let newQuantity = inputCartItemContentSettingsQuantity;
+  newQuantity.addEventListener('change', function(){
+    newQuantity.innerText = newQuantity.value; 
 
-// nous appellons L'api pour recuperer la base de donner
-fetch('http://localhost:3000/api/products')
+    validSend = verifAddCart(newQuantity.value);
+
+      if(validSend == false ){ 
+        errMsg.innerText="  : (1-100)"; 
+        errMsg.style.color = "red";
+
+        return 0; // on stop l'event sans enregistrer
+      }else{
+        errMsg.innerText="";
+      };
+
+    let parent = newQuantity.closest('article')
+    for(let i in cart){
+      if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
+        cart[i].quantity = newQuantity.value;
+        console.log("nouvelle quantité", newQuantity.value);
+
+        saveOnLocalStorage();
+      }
+    }
+  });
+  //<--
+  
+}
+// FIN DE CREATION ET AJOUT DE NOUVELLE ELEMENT
+
+//VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
+const verifAddCart = (valueQuantity) => { 
+  let rege = new RegExp ('^([1-9]|[1-9][0-9]|100)$'); // '^' indique qu'il doit commencer par, '$' indique qu'il doit finir par et donc encadre le resultat voulu , etant donné qu'il ne peut commencer par "-" il ne peu etre négatif et etant donné qu'il doit terminer par un nombre il ne peu y avoir de virgule et est donc entier
+  console.log('resultat test : ', rege.test(valueQuantity) );
+  return rege.test(valueQuantity); // return false/true
+}
+//FIN VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
+
+//ENREGISTREMENT DE LA CART SUR LE LOCALSTORAGE
+const  saveOnLocalStorage = () =>{
+  cartJSON = JSON.stringify(cart);
+  localStorage.setItem('cart', cartJSON);
+  console.log("new local storage : ", localStorage.cart);
+}
+//FIN ENREGISTREMENT DE LA CART SUR LE LOCALSTORAGE
+
+
+
+//FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
+const calculPricTotal = (base, tab) => {
+    priceTotal += ( parseInt(base.price)*(parseInt(tab.quantity)) );
+    quantityTotal += parseInt(tab.quantity);
+}
+// FIN FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
+
+//RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
+for(let i in cart){
+  fetch(`http://localhost:3000/api/products/${cart[i]._id}`)
   .then(function(res) {
     if (res.ok){
       return res.json();
@@ -128,36 +196,18 @@ fetch('http://localhost:3000/api/products')
     console.log('Oups, je ne sais pas non plus ce qu il se passe!');
   })
 
-  .then(function(result){ // resultat de la Promise
-    console.log(result); // test pour voir l'affichage si nous avons les bonne donné
-    comparaisonTableau(result, cart);
-    
-    //ajout prix et quantité
-    document.getElementById('totalQuantity').innerText = quantityTotal;
-    document.getElementById('totalPrice').innerText = priceTotal;
-
-    // var deleteBtn = document.getElementsByClassName("deleteItem");
-    // for (let i in deleteBtn){
-    // console.log('valeur deleteBtn[1]', deleteBtn[1]);
-    // console.log('parent de ', deleteBtn[1].parentElement);
-    // // deleteBtn.addEventListener('click',deleteStuff);
-    // }
-  
-    
+  .then(function(result){ 
+    newElement(result, cart[i]);
+    calculPricTotal(result, cart[i]);
+    console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal)
   });
+}
+//FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 
-  const deleteStuff = () => {
-    console.log('tata')
-    var elt =  deleteBtn.parentElement;
-    console.log("++++++");
-    console.log(elt.dataset.id);
-    console.log("++++++");
+//AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
+// --> ATTENTION MARCHE PAS RENVOI 0 VALEUR NON RETENU DE LA FONCTION THEN()
+ console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal);
+ document.getElementById('totalQuantity').innerText = quantityTotal; 
+ document.getElementById('totalPrice').innerText = priceTotal;
+//FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 
-  };
-
-// // // ne s'affiche pas 
-  // var deleteBtn = document.getElementsByClassName("deleteItem");
-  // for (let i in deleteBtn){
-  // console.log('valeur deleteBtn', deleteBtn);
-  // deleteBtn.addEventListener('click',deleteStuff);
-  // }
