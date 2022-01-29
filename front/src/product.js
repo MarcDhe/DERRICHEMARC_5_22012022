@@ -156,7 +156,7 @@ const verifAddCart = (valueQuantity, valueColors) => {
    //https://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
    //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
 
-   var cartJSON = JSON.stringify(cart);
+   let cartJSON = JSON.stringify(cart);
    localStorage.setItem('cart', cartJSON); // ici si pas JSON peu pas LIRE le console.log
    console.log(localStorage.cart)
    console.log("tata", +localStorage.cartJSON);

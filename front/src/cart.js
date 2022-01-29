@@ -1,8 +1,4 @@
 // localStorage.clear();
-let tableauX = [ 3, 3 , 'hit'];
-console.log(tableauX);
-tableauX.splice(1,1);
-console.log(tableauX);
  
 let cartJSON = localStorage.getItem('cart');
 let cart = JSON.parse(cartJSON);
@@ -17,6 +13,8 @@ let cart = JSON.parse(cartJSON);
 
 console.log("cart", cart);
 
+let contact = {};
+let products = [];
 let priceTotal = 0;
 let quantityTotal = 0;
 let prix = 0;
@@ -100,6 +98,7 @@ const newElement = (tab1, tab2) => {
   pCartItemContentSettingsQuantity.innerText = 'Qté : ';
   inputCartItemContentSettingsQuantity.setAttribute('value', tab2.quantity);
   inputCartItemContentSettingsQuantity.setAttribute('name', 'itemQuantity');
+  inputCartItemContentSettingsQuantity.setAttribute('type', 'number');
   inputCartItemContentSettingsQuantity.setAttribute('min', '1');
   inputCartItemContentSettingsQuantity.setAttribute('max', '100');
   //
@@ -135,7 +134,7 @@ const newElement = (tab1, tab2) => {
     validSend = verifAddCart(newQuantity.value);
 
       if(validSend == false ){ 
-        errMsg.innerText="  : (1-100)"; 
+        errMsg.innerText=": (1-100)"; 
         errMsg.style.color = "red";
 
         return 0; // on stop l'event sans enregistrer
@@ -195,7 +194,6 @@ for(let i in cart){
   .catch (function(err) {
     console.log('Oups, je ne sais pas non plus ce qu il se passe!');
   })
-
   .then(function(result){ 
     newElement(result, cart[i]);
     calculPricTotal(result, cart[i]);
@@ -211,3 +209,120 @@ for(let i in cart){
  document.getElementById('totalPrice').innerText = priceTotal;
 //FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 
+//CREATION FONCTION VERIFICATION FORMULAIRE
+const verifForm = () =>{
+
+  let formValid = true;
+
+  let firstNameForm = document.getElementById('firstName').value;
+  let lastNameForm = document.getElementById('lastName').value;
+  let addressForm = document.getElementById('address').value;
+  let cityForm = document.getElementById('city').value;
+  let emailForm = document.getElementById('email').value;
+
+
+  let regexText = new RegExp('[a-zA-Z\- ]'); // uniquement lettre min ou maj ou '-'
+  let regexTextChiffre = new RegExp('[a-zA-Z0-9\- ]'); // ATTENTION l'espace est volontaire pour autorisé les espaces
+  let regexEmail = new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"); // syntaxe recuperer https://www.w3resource.com/javascript/form/email-validation.php
+
+  if(regexText.test(firstNameForm) == false){
+    document.getElementById('firstNameErrorMsg').innerText = 'Prénom non valide'; 
+  }else{ // efface le msg si il y en avait un 
+    document.getElementById('firstNameErrorMsg').innerText = ''; 
+    console.log("prenom : true" )
+  };
+  if(regexText.test(lastNameForm) == false){
+    formValid = false;
+    document.getElementById('lastNameErrorMsg').innerText = 'Nom non valide'; 
+  }else{// efface le msg si il y en avait un 
+    document.getElementById('lastNameErrorMsg').innerText = ''; 
+  };
+  if(regexTextChiffre.test(addressForm) == false){
+    formValid = false;
+    document.getElementById('addressErrorMsg').innerText = 'Adresse non valide'; 
+  }else{// efface le msg si il y en avait un 
+    document.getElementById('addressErrorMsg').innerText = ''; 
+  };
+  if(regexText.test(cityForm) == false){
+    formValid = false;
+    document.getElementById('cityErrorMsg').innerText = 'Ville non valide'; 
+  }else{// efface le msg si il y en avait un 
+    document.getElementById('cityErrorMsg').innerText = ''; 
+  };
+  if(regexEmail.test(emailForm) == false){
+    formValid = false;
+    document.getElementById('emailErrorMsg').innerText = 'adresse mail non valide'; 
+  }else{// efface le msg si il y en avait un 
+    document.getElementById('emailErrorMsg').innerText = ''; 
+  };
+
+  //SI UN DES ELEMENTS N'EST PAS BON ON RETOURNE 0;
+  if(formValid == false){
+    console.log("++++++++");
+    console.log("Formaulaire faux !! ");
+    console.log("++++++++");
+
+    return 0;
+  }
+
+  createContactCard();
+  createProctuctsArray();
+  sendContactCard();
+
+}
+//FIN CREATION FONCTION VERIFICATION FORMULAIRE
+
+//CREATION CARTE CONTACT
+const createContactCard = () =>{ 
+  contact = { // model de contact dans back/controllers/product.js
+    firstName : document.getElementById('firstName').value,
+    lastName : document.getElementById('lastName').value,
+    address : document.getElementById('address').value,
+    city : document.getElementById('city').value,
+    email : document.getElementById('email').value
+  }
+  console.log('carte du contact : ', contact);
+}
+//FIN CREATION CARTE CONTACT
+
+//CREATION DU TABLEAU DES PRODUITS A ENVOYER A L'API
+const createProctuctsArray = () => {
+  for (let i in cart){ // model products dans back/controllers/product.js
+    products[i] = cart[i]._id;  
+  }
+  console.log('tableau produits a envoyer: ', products);
+}
+//CREATION DU TABLEAU DES PRODUITS A ENVOYER A L'API
+
+
+//ENVOIE DE LA CARTE CONTACT ET DU PANIER A L'API
+const sendContactCard = () => {
+  // let contactJSON = JSON.stringify(contact);
+  //rappel: cartJSON = localStorage.getItem('cart');
+fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: { 
+  'Accept': 'application/json', 
+  'Content-Type': 'application/json' 
+  },// body pour les données que l'on veut envoyer
+    body: JSON.stringify({contact, products}) // si doc envoyer  != de expects request contains  --> requete 400
+})
+.then(function(res) {
+  if (res.ok) {
+    return res.json();
+  }
+})
+.then(function(value) { 
+    console.log('valeur retour API :', value) ;
+});
+
+}
+
+//FIN ENVOIE DE LA CARTE CONTACT A L'API
+
+// CREATION EVENEMENT BOUTON COMMANDER
+document
+  .getElementById('order')
+  .addEventListener('click', verifForm);
+
+// FIN CREATION EVENEMENT BOUTON COMMANDER
