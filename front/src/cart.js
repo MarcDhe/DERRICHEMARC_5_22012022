@@ -3,6 +3,7 @@
 let cartJSON = localStorage.getItem('cart');
 let cart = JSON.parse(cartJSON);
 
+
 // if(cart== null){   //NE MARCHE PAS APRES SUPPRESSION D'ARTICLE CAR cart = [];
 //   console.log('tata');
 //   let emptyCart = document.createElement("p");
@@ -10,6 +11,8 @@ let cart = JSON.parse(cartJSON);
 //   emptyCart.innerText = "( Votre Panier est Vide )";
 //   emptyCart.style.textAlign = 'center';
 // }
+
+console.log("def : ", document.getElementById('tata'));
 
 console.log("cart", cart);
 
@@ -19,6 +22,7 @@ let priceTotal = 0;
 let quantityTotal = 0;
 let prix = 0;
 let validSend = true;
+let valueJSON = 0;
 
 
 
@@ -211,7 +215,6 @@ for(let i in cart){
 
 //CREATION FONCTION VERIFICATION FORMULAIRE
 const verifForm = () =>{
-
   let formValid = true;
 
   let firstNameForm = document.getElementById('firstName').value;
@@ -268,6 +271,9 @@ const verifForm = () =>{
   createContactCard();
   createProctuctsArray();
   sendContactCard();
+  
+  // moveToConfirmationPage();
+
 
 }
 //FIN CREATION FONCTION VERIFICATION FORMULAIRE
@@ -297,28 +303,34 @@ const createProctuctsArray = () => {
 
 //ENVOIE DE LA CARTE CONTACT ET DU PANIER A L'API
 const sendContactCard = () => {
-  // let contactJSON = JSON.stringify(contact);
-  //rappel: cartJSON = localStorage.getItem('cart');
-fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: { 
-  'Accept': 'application/json', 
-  'Content-Type': 'application/json' 
-  },// body pour les données que l'on veut envoyer
-    body: JSON.stringify({contact, products}) // si doc envoyer  != de expects request contains  --> requete 400
-})
-.then(function(res) {
-  if (res.ok) {
-    return res.json();
-  }
-})
-.then(function(value) { 
-    console.log('valeur retour API :', value) ;
-});
 
+  fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: { 
+    'Accept': 'application/json', 
+    'Content-Type': 'application/json' 
+    },// body pour les données que l'on veut envoyer
+      body: JSON.stringify({contact, products}) // si doc envoyer  != de expects request contains  --> requete 400
+  })
+  .then(function(res) {
+    if (res.ok) {
+      return res.json();
+    }
+  })
+  .then(function(value) { // ATTENTION ne pas oublié que le retour est un objet
+      console.log('valeur retour API :', value);
+      
+      moveToConfirmationPage(value.orderId);
+  });
+}
+//FIN ENVOIE DE LA CARTE CONTACT A L'API
+const moveToConfirmationPage = (e) => {
+  window.location = `./confirmation.html?orderId=${e}`
 }
 
-//FIN ENVOIE DE LA CARTE CONTACT A L'API
+//NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
+
+// FIN NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 
 // CREATION EVENEMENT BOUTON COMMANDER
 document
@@ -326,3 +338,17 @@ document
   .addEventListener('click', verifForm);
 
 // FIN CREATION EVENEMENT BOUTON COMMANDER
+
+
+                    //########################//
+                    // PAGE CONFIRMATION.HTML //
+                    //########################//
+                
+let currentUrl = window.location; // nous recuperons l'adresse url dans laquelle nous somme 
+let url = new URL(currentUrl);
+let orderId = url.searchParams.get("orderId");
+
+document
+  .getElementById('orderId')
+  .innerText = orderId;
+                    
