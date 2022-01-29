@@ -1,8 +1,4 @@
 // localStorage.clear();
- 
-let cartJSON = localStorage.getItem('cart');
-let cart = JSON.parse(cartJSON);
-
 
 // if(cart== null){   //NE MARCHE PAS APRES SUPPRESSION D'ARTICLE CAR cart = [];
 //   console.log('tata');
@@ -12,10 +8,33 @@ let cart = JSON.parse(cartJSON);
 //   emptyCart.style.textAlign = 'center';
 // }
 
-console.log("def : ", document.getElementById('tata'));
 
-console.log("cart", cart);
 
+
+                      //########################//
+                      // PAGE CONFIRMATION.HTML //
+                      //########################//
+
+            // SAVOIR SI L'ON EST DANS LA PAGE CONFIRMATION // 
+
+let currentUrl = window.location; // autre notation: windows.location est un objet window.location.href pour l'url  
+let url = new URL(currentUrl);
+let urlRegex = new RegExp ('confirmation');
+let resultBeInConfirmationPage = urlRegex.test(url);
+console.log('resultat test:', resultBeInConfirmationPage)
+
+//on execute le code pour la page si true
+if(resultBeInConfirmationPage == true){
+let orderId = url.searchParams.get("orderId");
+document
+  .getElementById('orderId')
+  .innerText = orderId;
+}
+          //FIN SAVOIR SI L'ON EST DANS LA PAGE CONFIRMATION // 
+
+                      //########################//
+                          // PAGE CART.HTML //
+                      //########################//
 let contact = {};
 let products = [];
 let priceTotal = 0;
@@ -23,11 +42,16 @@ let quantityTotal = 0;
 let prix = 0;
 let validSend = true;
 let valueJSON = 0;
+// récuperation des données du localStorage
+let cartJSON = localStorage.getItem('cart');
+let cart = JSON.parse(cartJSON);
 
-
+//########################//
+//#CREATION DES FONCTIONS#//
+//########################//
 
 // CREATION ET AJOUT DE NOUVELLE ELEMENT
-const newElement = (tab1, tab2) => {
+const newElement = (tab1, tab2) => { 
 
               //CREATION DES ELEMENTS //
 
@@ -186,32 +210,6 @@ const calculPricTotal = (base, tab) => {
 }
 // FIN FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
 
-//RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
-for(let i in cart){
-  fetch(`http://localhost:3000/api/products/${cart[i]._id}`)
-  .then(function(res) {
-    if (res.ok){
-      return res.json();
-    }
-  })
-  //si erreur
-  .catch (function(err) {
-    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
-  })
-  .then(function(result){ 
-    newElement(result, cart[i]);
-    calculPricTotal(result, cart[i]);
-    console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal)
-  });
-}
-//FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
-
-//AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
-// --> ATTENTION MARCHE PAS RENVOI 0 VALEUR NON RETENU DE LA FONCTION THEN()
- console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal);
- document.getElementById('totalQuantity').innerText = quantityTotal; 
- document.getElementById('totalPrice').innerText = priceTotal;
-//FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 
 //CREATION FONCTION VERIFICATION FORMULAIRE
 const verifForm = () =>{
@@ -273,8 +271,6 @@ const verifForm = () =>{
   sendContactCard();
   
   // moveToConfirmationPage();
-
-
 }
 //FIN CREATION FONCTION VERIFICATION FORMULAIRE
 
@@ -324,13 +320,48 @@ const sendContactCard = () => {
   });
 }
 //FIN ENVOIE DE LA CARTE CONTACT A L'API
+
+//NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 const moveToConfirmationPage = (e) => {
   window.location = `./confirmation.html?orderId=${e}`
 }
 
-//NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
-
 // FIN NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
+
+//##############################//
+//# FIN CREATION DES FONCTIONS #//
+//#############################//
+
+//##############################//
+//#       EXECUTION CODE      #//
+//#############################//
+
+//RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
+
+for(let i in cart){
+  fetch(`http://localhost:3000/api/products/${cart[i]._id}`)
+  .then(function(res) {
+    if (res.ok){
+      return res.json();
+    }
+  })
+  //si erreur
+  .catch (function(err) {
+    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
+  })
+  .then(function(result){ 
+    newElement(result, cart[i]);
+    calculPricTotal(result, cart[i]);
+  });
+}
+//FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
+
+//AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
+// --> ATTENTION MARCHE PAS RENVOI 0 VALEUR NON RETENU DE LA FONCTION THEN()
+ console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal);
+ document.getElementById('totalQuantity').innerText = quantityTotal; 
+ document.getElementById('totalPrice').innerText = priceTotal;
+//FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 
 // CREATION EVENEMENT BOUTON COMMANDER
 document
@@ -340,15 +371,3 @@ document
 // FIN CREATION EVENEMENT BOUTON COMMANDER
 
 
-                    //########################//
-                    // PAGE CONFIRMATION.HTML //
-                    //########################//
-                
-let currentUrl = window.location; // nous recuperons l'adresse url dans laquelle nous somme 
-let url = new URL(currentUrl);
-let orderId = url.searchParams.get("orderId");
-
-document
-  .getElementById('orderId')
-  .innerText = orderId;
-                    
