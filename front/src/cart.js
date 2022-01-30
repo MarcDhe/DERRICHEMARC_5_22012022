@@ -8,40 +8,12 @@
 //   emptyCart.style.textAlign = 'center';
 // }
 
-
-
-
-                      //########################//
-                      // PAGE CONFIRMATION.HTML //
-                      //########################//
-
-            // SAVOIR SI L'ON EST DANS LA PAGE CONFIRMATION // 
-
-let currentUrl = window.location; // autre notation: windows.location est un objet window.location.href pour l'url  
-let url = new URL(currentUrl);
-let urlRegex = new RegExp ('confirmation');
-let resultBeInConfirmationPage = urlRegex.test(url);
-console.log('resultat test:', resultBeInConfirmationPage)
-
-//on execute le code pour la page si true
-if(resultBeInConfirmationPage == true){
-let orderId = url.searchParams.get("orderId");
-document
-  .getElementById('orderId')
-  .innerText = orderId;
-}
-          //FIN SAVOIR SI L'ON EST DANS LA PAGE CONFIRMATION // 
-
-                      //########################//
-                          // PAGE CART.HTML //
-                      //########################//
 let contact = {};
 let products = [];
 let priceTotal = 0;
 let quantityTotal = 0;
-let prix = 0;
 let validSend = true;
-let valueJSON = 0;
+
 // récuperation des données du localStorage
 let cartJSON = localStorage.getItem('cart');
 let cart = JSON.parse(cartJSON);
@@ -337,32 +309,41 @@ const moveToConfirmationPage = (e) => {
 //#############################//
 
 //RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
-
-for(let i in cart){
-  fetch(`http://localhost:3000/api/products/${cart[i]._id}`)
-  .then(function(res) {
-    if (res.ok){
-      return res.json();
-    }
-  })
-  //si erreur
-  .catch (function(err) {
-    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
-  })
-  .then(function(result){ 
-    newElement(result, cart[i]);
-    calculPricTotal(result, cart[i]);
-  });
+async function getData(){
+  return  fetch(`http://localhost:3000/api/products/${cart[i]._id}`)
+    .then(function(res) {
+      if (res.ok){
+        return res.json();
+      }
+    })
+    .then(function(result){ 
+      newElement(result, cart[i]);
+      calculPricTotal(result, cart[i]);
+    })
+    //si erreur
+    .catch (function(err) {
+      console.log('Oups, je ne sais pas non plus ce qu il se passe!');
+    });
+ 
 }
 //FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 
 //AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
-// --> ATTENTION MARCHE PAS RENVOI 0 VALEUR NON RETENU DE LA FONCTION THEN()
+function printPrice(){
  console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal);
  document.getElementById('totalQuantity').innerText = quantityTotal; 
  document.getElementById('totalPrice').innerText = priceTotal;
+}
 //FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
-
+async function main (){
+  let tab = [];
+  for (let i in cart){
+    tab[i] = await getData();
+  }
+  console.log ('tab = :', tab);
+  printPrice();
+}
+main();
 // CREATION EVENEMENT BOUTON COMMANDER
 document
   .getElementById('order')
