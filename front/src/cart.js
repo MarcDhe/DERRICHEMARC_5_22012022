@@ -1,13 +1,5 @@
 // localStorage.clear();
 
-// if(cart== null){   //NE MARCHE PAS APRES SUPPRESSION D'ARTICLE CAR cart = [];
-//   console.log('tata');
-//   let emptyCart = document.createElement("p");
-//   document.getElementById('cart__items').appendChild(emptyCart);
-//   emptyCart.innerText = "( Votre Panier est Vide )";
-//   emptyCart.style.textAlign = 'center';
-// }
-
 let contact = {};
 let products = [];
 let tab = [];
@@ -22,6 +14,19 @@ let cart = JSON.parse(cartJSON);
 //########################//
 //#CREATION DES FONCTIONS#//
 //########################//
+
+//RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
+async function getData(product){
+  return  fetch(`http://localhost:3000/api/products/${product._id}`)
+  .then(function(result) {   
+      return result.json();
+    })
+  .catch (function(err) {
+    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
+  });
+}
+//FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
+
 
 // CREATION ET AJOUT DE NOUVELLE ELEMENT
 const newElement = (tab1, tab2) => { 
@@ -110,10 +115,12 @@ const newElement = (tab1, tab2) => {
   let errMsg = document.createElement("p");
   inputCartItemContentSettingsQuantity.parentElement.appendChild(errMsg);
 
-               // AJOUT CREATION EVENT //
+               // AJOUT CREATION EVENT // ( fonctions d'evenements créer ici pour ne pas perdre les valeurs des pointeurs de balise HTML )
   //-->              
   pCartItemContentSettingsDelete.addEventListener('click', function(){
-    let parent = pCartItemContentSettingsDelete.closest('article'); // https://developer.mozilla.org/fr/docs/Web/API/Element/closest element parent le plus proche etant un article
+    priceTotal = 0; // important
+    quantityTotal = 0; // pour le recalcul
+    let parent = pCartItemContentSettingsDelete.closest('article'); // https://developer.mozilla.org/fr/docs/Web/API/Element/closest
     for(let i in cart){
       if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
         cart.splice(i,1); // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
@@ -121,47 +128,56 @@ const newElement = (tab1, tab2) => {
         document
           .getElementById('cart__items')
           .removeChild(parent);
+          console.log('nouvelle cart', cart);
       }
-  
     }
-
+    for(let i in cart){ // ne peut etre fait dans la boucle précédent car let i in cart prend pour valeur lancienne dimmension de cart
+      calculPricTotal(tab[i], cart[i]);
+    }
+  displayPrice();
   });
   //<--
   //-->
+  console.log('tab valeur', tab);
   let newQuantity = inputCartItemContentSettingsQuantity;
   newQuantity.addEventListener('change', function(){
     newQuantity.innerText = newQuantity.value; 
-
     validSend = verifAddCart(newQuantity.value);
-
       if(validSend == false ){ 
         errMsg.innerText=": (1-100)"; 
         errMsg.style.color = "red";
-
         return 0; // on stop l'event sans enregistrer
       }else{
         errMsg.innerText="";
       };
-
     let parent = newQuantity.closest('article')
+    priceTotal = 0;  // important
+    quantityTotal = 0; // réinitialisation des valeurs
     for(let i in cart){
       if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
         cart[i].quantity = newQuantity.value;
         console.log("nouvelle quantité", newQuantity.value);
-
         saveOnLocalStorage();
+        console.log('nouvelle cart', cart);
       }
+      calculPricTotal(tab[i], cart[i]);
     }
+    displayPrice();
   });
   //<--
-  
 }
 // FIN DE CREATION ET AJOUT DE NOUVELLE ELEMENT
+
+//FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
+function calculPricTotal(base, tab){
+  priceTotal += ( parseInt(base.price)*(parseInt(tab.quantity)) );
+  quantityTotal += parseInt(tab.quantity);
+}
+// FIN FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
 
 //VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
 const verifAddCart = (valueQuantity) => { 
   let rege = new RegExp ('^([1-9]|[1-9][0-9]|100)$'); // '^' indique qu'il doit commencer par, '$' indique qu'il doit finir par et donc encadre le resultat voulu , etant donné qu'il ne peut commencer par "-" il ne peu etre négatif et etant donné qu'il doit terminer par un nombre il ne peu y avoir de virgule et est donc entier
-  console.log('resultat test : ', rege.test(valueQuantity) );
   return rege.test(valueQuantity); // return false/true
 }
 //FIN VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
@@ -173,16 +189,6 @@ const  saveOnLocalStorage = () =>{
   console.log("new local storage : ", localStorage.cart);
 }
 //FIN ENREGISTREMENT DE LA CART SUR LE LOCALSTORAGE
-
-
-
-//FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
-function calculPricTotal(base, tab){
-    priceTotal += ( parseInt(base.price)*(parseInt(tab.quantity)) );
-    quantityTotal += parseInt(tab.quantity);
-}
-// FIN FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
-
 
 //CREATION FONCTION VERIFICATION FORMULAIRE
 function verifForm(){
@@ -230,20 +236,14 @@ function verifForm(){
     document.getElementById('emailErrorMsg').innerText = ''; 
   };
 
-  //SI UN DES ELEMENTS N'EST PAS BON ON RETOURNE 0;
-  if(formValid == false){
-    console.log("++++++++");
-    console.log("Formaulaire faux !! ");
-    console.log("++++++++");
-
+  if(formValid == false){ //SI L'UN DES ELEMENTS N'EST PAS BON ON RETOURNE 0;
     return 0;
   }
 
   createContactCard();
   createProctuctsArray();
   sendContactCard();
-  
-  // moveToConfirmationPage();
+  moveToConfirmationPage();
 }
 //FIN CREATION FONCTION VERIFICATION FORMULAIRE
 
@@ -269,6 +269,11 @@ const createProctuctsArray = () => {
 }
 //CREATION DU TABLEAU DES PRODUITS A ENVOYER A L'API
 
+//NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
+const moveToConfirmationPage = (value) => {
+  window.location = `./confirmation.html?orderId=${value}`
+}
+// FIN NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 
 //ENVOIE DE LA CARTE CONTACT ET DU PANIER A L'API
 const sendContactCard = () => {
@@ -285,18 +290,11 @@ const sendContactCard = () => {
       return res.json();
     }
   })
-  .then(function(value) { // ATTENTION ne pas oublié que le retour est un objet
-      console.log('valeur retour API :', value);
+  .then(function(value) { // --> le retour est un objet
       moveToConfirmationPage(value.orderId);
   });
 }
 //FIN ENVOIE DE LA CARTE CONTACT A L'API
-
-//NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
-const moveToConfirmationPage = (value) => {
-  window.location = `./confirmation.html?orderId=${value}`
-}
-// FIN NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 
 //##############################//
 //# FIN CREATION DES FONCTIONS #//
@@ -306,18 +304,6 @@ const moveToConfirmationPage = (value) => {
 //#       EXECUTION CODE      #//
 //#############################//
 
-//RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
-async function getData(product){
-  return  fetch(`http://localhost:3000/api/products/${product._id}`)
-  .then(function(result) {   
-      return result.json();
-    })
-  .catch (function(err) {
-    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
-  });
- 
-}
-//FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 
 //AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 function displayPrice(){

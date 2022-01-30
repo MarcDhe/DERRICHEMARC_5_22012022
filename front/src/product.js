@@ -1,20 +1,12 @@
-// localStorage.clear();
-// delcare la variable iDprodcut et autre
 let idProduct = 0;
 let newCartAdd ;
 let cart = [];
 
-//on veut que si le local storage si il n'existe pas crée la variable cart 
-// et si elle existe l'ectraire de son format JSON
+//SI LOCAL STORAGE EXISTE ON RECUPERE LES DONNEES
 if(localStorage.cart !== undefined){
   let preCart=localStorage.getItem('cart');
   cart = JSON.parse(preCart);
-  console.log('cart existe :', cart)
-}else{
-  console.log("cart existe pas")
 }
-
-
 
 //creation d'un element pour afficher un message derreur au besoin
 let errMsg = document.createElement("p");
@@ -34,23 +26,18 @@ const getIdInUrl = () => {
 
 getIdInUrl(); // on appel la fonction maintenant et pas dans le fetch pour pouvoir avoir l'id sans await sur d'autre fonction
 
-// fonction qui va ajouter les elements au HTML
+// AJOUT DES ELEMENTS AU HTML
 const addHTML = (value) => {
-
-  //creation de la classe img
   let pictureArticle = document.createElement("img");
   let itemImg = document.getElementsByClassName("item__img")
   itemImg[0].appendChild(pictureArticle); // car itemImg retourne un tableau
 
-  // ajout du contenu
   pictureArticle.setAttribute("src", `${value.imageUrl}`);
   pictureArticle.setAttribute("alt", `${value.altTxt}`);
   
-
   document.getElementById("title").innerText = value.name;
   document.getElementById("price").innerText = value.price;
   document.getElementById("description").innerText = value.description;
-  
 }
 
 // fonction qui va gerer l'ajout des couleurs
@@ -88,6 +75,7 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
 //ATTENTION en faite il faut utilisé des regex
 //EXEMPLE REGEX POUR LA COULEUR ( let reg = new RegExp(/S+V+P//) ) + signifie suivie directement de donc ici S suivie directement de V suivie diredtement de P
 const verifAddCart = (valueQuantity, valueColors) => { 
+  let 
   if(valueColors == "" || valueQuantity>100 || valueQuantity<1 ){
   return false;
   }else{
@@ -151,17 +139,13 @@ const verifAddCart = (valueQuantity, valueColors) => {
     console.log(cart);
     console.log('-------');
     
-   // SOURCE du stringfy:
-   //https://openclassrooms.com/forum/sujet/ajouter-un-element-a-un-json
-   //https://stackoverflow.com/questions/4538269/adding-removing-items-from-a-javascript-object-with-jquery
 
    let cartJSON = JSON.stringify(cart);
    localStorage.setItem('cart', cartJSON); // ici si pas JSON peu pas LIRE le console.log
    console.log(localStorage.cart)
    console.log("tata", +localStorage.cartJSON);
-
   }
-  
+ 
 //CREATION EVENEMENT ENVOI DONNEES AU LOCALSTORAGE
   document
     .getElementById('addToCart')
