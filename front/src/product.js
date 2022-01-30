@@ -73,15 +73,14 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
       return res.json();
     }
   })
-  //si erreur
-  .catch (function(err) {
-    console.log('Oups, je ne sais pas non plus ce qu il se passe');
-  })
-  
   .then(function(result){ 
     console.log(result);
     addHTML(result);
     addColors(result.colors);
+  })
+    //si erreur
+    .catch (function(err) {
+      console.log('Oups, je ne sais pas non plus ce qu il se passe');
   });
 
 

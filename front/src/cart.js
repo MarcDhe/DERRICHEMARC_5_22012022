@@ -10,6 +10,7 @@
 
 let contact = {};
 let products = [];
+let tab = [];
 let priceTotal = 0;
 let quantityTotal = 0;
 let validSend = true;
@@ -116,14 +117,14 @@ const newElement = (tab1, tab2) => {
     for(let i in cart){
       if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
         cart.splice(i,1); // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
-
         saveOnLocalStorage();
-
         document
           .getElementById('cart__items')
           .removeChild(parent);
       }
+  
     }
+
   });
   //<--
   //-->
@@ -176,7 +177,7 @@ const  saveOnLocalStorage = () =>{
 
 
 //FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
-const calculPricTotal = (base, tab) => {
+function calculPricTotal(base, tab){
     priceTotal += ( parseInt(base.price)*(parseInt(tab.quantity)) );
     quantityTotal += parseInt(tab.quantity);
 }
@@ -184,7 +185,7 @@ const calculPricTotal = (base, tab) => {
 
 
 //CREATION FONCTION VERIFICATION FORMULAIRE
-const verifForm = () =>{
+function verifForm(){
   let formValid = true;
 
   let firstNameForm = document.getElementById('firstName').value;
@@ -271,7 +272,6 @@ const createProctuctsArray = () => {
 
 //ENVOIE DE LA CARTE CONTACT ET DU PANIER A L'API
 const sendContactCard = () => {
-
   fetch("http://localhost:3000/api/products/order", {
       method: "POST",
       headers: { 
@@ -287,17 +287,15 @@ const sendContactCard = () => {
   })
   .then(function(value) { // ATTENTION ne pas oublié que le retour est un objet
       console.log('valeur retour API :', value);
-      
       moveToConfirmationPage(value.orderId);
   });
 }
 //FIN ENVOIE DE LA CARTE CONTACT A L'API
 
 //NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
-const moveToConfirmationPage = (e) => {
-  window.location = `./confirmation.html?orderId=${e}`
+const moveToConfirmationPage = (value) => {
+  window.location = `./confirmation.html?orderId=${value}`
 }
-
 // FIN NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 
 //##############################//
@@ -309,46 +307,43 @@ const moveToConfirmationPage = (e) => {
 //#############################//
 
 //RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
-async function getData(){
-  return  fetch(`http://localhost:3000/api/products/${cart[i]._id}`)
-    .then(function(res) {
-      if (res.ok){
-        return res.json();
-      }
+async function getData(product){
+  return  fetch(`http://localhost:3000/api/products/${product._id}`)
+  .then(function(result) {   
+      return result.json();
     })
-    .then(function(result){ 
-      newElement(result, cart[i]);
-      calculPricTotal(result, cart[i]);
-    })
-    //si erreur
-    .catch (function(err) {
-      console.log('Oups, je ne sais pas non plus ce qu il se passe!');
-    });
+  .catch (function(err) {
+    console.log('Oups, je ne sais pas non plus ce qu il se passe!');
+  });
  
 }
 //FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 
 //AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
-function printPrice(){
+function displayPrice(){
  console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal);
  document.getElementById('totalQuantity').innerText = quantityTotal; 
  document.getElementById('totalPrice').innerText = priceTotal;
 }
 //FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 async function main (){
-  let tab = [];
   for (let i in cart){
-    tab[i] = await getData();
+    tab[i] = await getData(cart[i]);
+    newElement(tab[i], cart[i]);
+    calculPricTotal(tab[i], cart[i]);
   }
-  console.log ('tab = :', tab);
-  printPrice();
+  displayPrice();
 }
 main();
-// CREATION EVENEMENT BOUTON COMMANDER
+
+// CREATION EVENEMENT COMMANDER
 document
   .getElementById('order')
-  .addEventListener('click', verifForm);
+  .addEventListener('click',function(event){
+    event.preventDefault();
+    verifForm();
+  });
 
-// FIN CREATION EVENEMENT BOUTON COMMANDER
+// FIN CREATION EVENEMENT COMMANDER
 
 
