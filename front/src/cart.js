@@ -29,84 +29,68 @@ async function getData(product){
 const newElement = (tab1, tab2) => { 
               //CREATION DES ELEMENTS //
   let articleCartItem = document.createElement('article');
-
   let divCartItemImg = document.createElement('div');
   let imgCartItem = document.createElement('img');
-
-  let divCartItemContent = document.createElement('div');
-
-  let divCartItemContentDescription = document.createElement('div');
-  let titleCartItemContentDescription = document.createElement('h2');
-  let pOneCartItemContentDescrpition = document.createElement('p');
-  let pTwoCartItemContentDescrpition = document.createElement('p');
-
-  let divCartItemContentSettings = document.createElement('div');
-
-  let divCartItemContentSettingsQuantity = document.createElement('div');
-  let pCartItemContentSettingsQuantity = document.createElement('p');
-  let inputCartItemContentSettingsQuantity = document.createElement('input');
-
-  let divCartItemContentSettingsDelete = document.createElement('div');
-  let pCartItemContentSettingsDelete = document.createElement('p');
+  let divContent = document.createElement('div');
+  let divDescription = document.createElement('div');
+  let titleDescription = document.createElement('h2');
+  let pOneDescrpition = document.createElement('p');
+  let pTwoDescrpition = document.createElement('p');
+  let divSettings = document.createElement('div');
+  let divQuantity = document.createElement('div');
+  let pQuantity = document.createElement('p');
+  let inputQuantity = document.createElement('input');
+  let divDelete = document.createElement('div');
+  let pDelete = document.createElement('p');
             // AJOUT AU HTML DES NOUVEAUX ELEMENTS // 
   document.getElementById('cart__items').appendChild(articleCartItem);
-  //
   articleCartItem.appendChild(divCartItemImg);
   divCartItemImg.appendChild(imgCartItem);
-  //
-  articleCartItem.appendChild(divCartItemContent);
-  //
-  divCartItemContent.appendChild(divCartItemContentDescription);
-  divCartItemContentDescription.appendChild(titleCartItemContentDescription);
-  divCartItemContentDescription.appendChild(pOneCartItemContentDescrpition);
-  divCartItemContentDescription.appendChild(pTwoCartItemContentDescrpition);
-  //
-  divCartItemContent.appendChild(divCartItemContentSettings);
-  //
-  divCartItemContentSettings.appendChild(divCartItemContentSettingsQuantity);
-  divCartItemContentSettingsQuantity.appendChild(pCartItemContentSettingsQuantity);
-  divCartItemContentSettingsQuantity.appendChild(inputCartItemContentSettingsQuantity);
-  //
-  divCartItemContentSettings.appendChild(divCartItemContentSettingsDelete);
-  divCartItemContentSettingsDelete.appendChild(pCartItemContentSettingsDelete);
+  articleCartItem.appendChild(divContent);
+  divContent.appendChild(divDescription);
+  divDescription.appendChild(titleDescription);
+  divDescription.appendChild(pOneDescrpition);
+  divDescription.appendChild(pTwoDescrpition);
+  divContent.appendChild(divSettings);
+  divSettings.appendChild(divQuantity);
+  divQuantity.appendChild(pQuantity);
+  divQuantity.appendChild(inputQuantity);
+  divSettings.appendChild(divDelete);
+  divDelete.appendChild(pDelete);
                // AJOUT DE CLASSE(S) AUX ELEMENTS CRÉES // 
   articleCartItem.classList.add("cart__item");
   divCartItemImg.classList.add("cart__item__img");
-  divCartItemContent.classList.add("cart__item__content");
-  divCartItemContentDescription.classList.add("cart__item__content");
-  divCartItemContentSettings.classList.add("cart__item__content__settings");
-  divCartItemContentSettingsQuantity.classList.add("cart__item__content__settings__quantity");
-  inputCartItemContentSettingsQuantity.classList.add("itemQuantity");
-  divCartItemContentSettingsDelete.classList.add("cart__item__content__settings__delete");
-  pCartItemContentSettingsDelete.classList.add("deleteItem");
+  divContent.classList.add("cart__item__content");
+  divDescription.classList.add("cart__item__content");
+  divSettings.classList.add("cart__item__content__settings");
+  divQuantity.classList.add("cart__item__content__settings__quantity");
+  inputQuantity.classList.add("itemQuantity");
+  divDelete.classList.add("cart__item__content__settings__delete");
+  pDelete.classList.add("deleteItem");
               // REMPLISSAGE AVEC LES VALEURS DU PRODUIT // 
   articleCartItem.setAttribute("data-id", tab1._id); // important pour le delete
   articleCartItem.setAttribute('data-color', tab2.colors);
-  //
   imgCartItem.setAttribute("src", tab1.imageUrl);
   imgCartItem.setAttribute("alt", tab1.altTxt);
-  //
-  titleCartItemContentDescription.innerText = tab1.name;
-  pOneCartItemContentDescrpition.innerText = tab2.colors;
-  pTwoCartItemContentDescrpition.innerText = `${tab1.price} €`;
-  //
-  pCartItemContentSettingsQuantity.innerText = 'Qté : ';
-  inputCartItemContentSettingsQuantity.setAttribute('value', tab2.quantity);
-  inputCartItemContentSettingsQuantity.setAttribute('name', 'itemQuantity');
-  inputCartItemContentSettingsQuantity.setAttribute('type', 'number');
-  inputCartItemContentSettingsQuantity.setAttribute('min', '1');
-  inputCartItemContentSettingsQuantity.setAttribute('max', '100');
-  //
-  pCartItemContentSettingsDelete.innerText='Supprimer';
+  titleDescription.innerText = tab1.name;
+  pOneDescrpition.innerText = tab2.colors;
+  pTwoDescrpition.innerText = `${tab1.price} €`;
+  pQuantity.innerText = 'Qté : ';
+  inputQuantity.setAttribute('value', tab2.quantity);
+  inputQuantity.setAttribute('name', 'itemQuantity');
+  inputQuantity.setAttribute('type', 'number');
+  inputQuantity.setAttribute('min', '1');
+  inputQuantity.setAttribute('max', '100');
+  pDelete.innerText='Supprimer';
                 // CREATION ELEMENT ERREUR //
   let errMsg = document.createElement("p");
-  inputCartItemContentSettingsQuantity.parentElement.appendChild(errMsg);
+  inputQuantity.parentElement.appendChild(errMsg);
                // AJOUT CREATION EVENT // ( fonctions d'evenements créer ici pour ne pas perdre les valeurs des pointeurs de balise HTML )
   //--> EVENT          
-  pCartItemContentSettingsDelete.addEventListener('click', function(){
+  pDelete.addEventListener('click', function(){
     priceTotal = 0; // important
     quantityTotal = 0; // pour le recalcul
-    let parent = pCartItemContentSettingsDelete.closest('article'); // https://developer.mozilla.org/fr/docs/Web/API/Element/closest
+    let parent = pDelete.closest('article'); // https://developer.mozilla.org/fr/docs/Web/API/Element/closest
     for(let i in cart){
       if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
         cart.splice(i,1); // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
@@ -123,7 +107,7 @@ const newElement = (tab1, tab2) => {
   });
   //<--
   //--> EVENT
-  let newQuantity = inputCartItemContentSettingsQuantity;
+  let newQuantity = inputQuantity;
   newQuantity.addEventListener('change', function(){
     newQuantity.innerText = newQuantity.value; 
     validSend = verifAddCart(newQuantity.value);
@@ -155,6 +139,12 @@ function calculPricTotal(base, tab){
   quantityTotal += parseInt(tab.quantity);
 };
 
+//AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
+function displayPrice(){
+  document.getElementById('totalQuantity').innerText = quantityTotal; 
+  document.getElementById('totalPrice').innerText = priceTotal;
+ }
+
 //VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
 const verifAddCart = (valueQuantity) => { 
   let rege = new RegExp ('^([1-9]|[1-9][0-9]|100)$'); // '^' indique qu'il doit commencer par, '$' indique qu'il doit finir par et donc encadre le resultat voulu , etant donné qu'il ne peut commencer par "-" il ne peu etre négatif et etant donné qu'il doit terminer par un nombre il ne peu y avoir de virgule et est donc entier
@@ -185,7 +175,6 @@ function verifForm(){
     document.getElementById('firstNameErrorMsg').innerText = 'Prénom non valide'; 
   }else{ // efface le msg si il y en avait un 
     document.getElementById('firstNameErrorMsg').innerText = ''; 
-    console.log("prenom : true" )
   };
   if(regexText.test(lastNameForm) == false){
     formValid = false;
@@ -218,7 +207,6 @@ function verifForm(){
   createContactCard();
   createProctuctsArray();
   sendContactCard();
-  moveToConfirmationPage();
 };
 
 //CREATION CARTE CONTACT
@@ -259,15 +247,9 @@ const sendContactCard = () => {
       return res.json();
     }
   })
-  .then(function(value) { // --> le retour est un objet
-      moveToConfirmationPage(value.orderId);
+  .then(function(value) {   
+    moveToConfirmationPage(value.orderId);
   });
-}
-
-//AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
-function displayPrice(){
- document.getElementById('totalQuantity').innerText = quantityTotal; 
- document.getElementById('totalPrice').innerText = priceTotal;
 }
 
 async function main (){
@@ -279,6 +261,7 @@ async function main (){
   }
   displayPrice();
 }
+
 main();
 
 // CREATION EVENEMENT COMMANDER
