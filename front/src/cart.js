@@ -1,5 +1,3 @@
-// localStorage.clear();
-
 let contact = {};
 let products = [];
 let tab = [];
@@ -11,9 +9,6 @@ let validSend = true;
 let cartJSON = localStorage.getItem('cart');
 let cart = JSON.parse(cartJSON);
 
-//########################//
-//#CREATION DES FONCTIONS#//
-//########################//
 
 //RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 async function getData(product){
@@ -295,15 +290,6 @@ const sendContactCard = () => {
   });
 }
 //FIN ENVOIE DE LA CARTE CONTACT A L'API
-
-//##############################//
-//# FIN CREATION DES FONCTIONS #//
-//#############################//
-
-//##############################//
-//#       EXECUTION CODE      #//
-//#############################//
-
 
 //AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 function displayPrice(){

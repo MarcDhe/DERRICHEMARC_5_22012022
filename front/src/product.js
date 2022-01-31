@@ -1,36 +1,36 @@
 let idProduct = 0;
-let newCartAdd ;
 let cart = [];
 
 //SI LOCAL STORAGE EXISTE ON RECUPERE LES DONNEES
-if(localStorage.cart !== undefined){
-  let preCart=localStorage.getItem('cart');
-  cart = JSON.parse(preCart);
+function checkStorage(){
+  if(localStorage.cart !== undefined){
+    let preCart=localStorage.getItem('cart');
+    cart = JSON.parse(preCart);
+  }
 }
 
-//creation d'un element pour afficher un message derreur au besoin
-let errMsg = document.createElement("p");
-errMsg.setAttribute('class','erreur');
-let articleAdd = document.getElementsByTagName('article'); //ne pas oublié renvoi tableau
-articleAdd[0].appendChild(errMsg); 
+//CREE UN EMPLACEMENT DANS LE HTML POUR AFFICHER LES MESSAGGE D'ERREUR
+function createErrContainer(){
+  let errMsg = document.createElement("p");
+  errMsg.setAttribute('id','error');
+  let articleAdd = document.getElementsByTagName('article'); //ne pas oublier, renvoi un tableau
+  articleAdd[0].appendChild(errMsg); 
+}
 
-//fonction qui recupere l'id depuis l'URL
+//RECUPERATION DE L'ID DEPUIS L'URL
 const getIdInUrl = () => {
-
-  let currentUrl = window.location; // nous recuperons l'adresse url dans laquelle nous somme 
+  let currentUrl = window.location; 
   let url = new URL(currentUrl);
   let id = url.searchParams.get("id");
   
   return idProduct = id;
 }
 
-getIdInUrl(); // on appel la fonction maintenant et pas dans le fetch pour pouvoir avoir l'id sans await sur d'autre fonction
-
 // AJOUT DES ELEMENTS AU HTML
 const addHTML = (value) => {
   let pictureArticle = document.createElement("img");
   let itemImg = document.getElementsByClassName("item__img")
-  itemImg[0].appendChild(pictureArticle); // car itemImg retourne un tableau
+  itemImg[0].appendChild(pictureArticle); //itemImg retourne un tableau
 
   pictureArticle.setAttribute("src", `${value.imageUrl}`);
   pictureArticle.setAttribute("alt", `${value.altTxt}`);
@@ -40,20 +40,19 @@ const addHTML = (value) => {
   document.getElementById("description").innerText = value.description;
 }
 
-// fonction qui va gerer l'ajout des couleurs
-const addColors = (tableau) => {
-  for(let i in tableau) {
+// AJOUT DES COULEURS DISPONIBLES DU PRODUIT
+const addColors = (array) => {
+  for(let i in array) {
     let optionColor = document.createElement("option");
     document.getElementById("colors").appendChild(optionColor);
-    optionColor.setAttribute("value", tableau[i]);
-    optionColor.innerText = tableau[i];
-    console.log(tableau[i]);
+    optionColor.setAttribute("value", array[i]);
+    optionColor.innerText = array[i];
+    console.log(array[i]);
   }
 }
 
-
-// nous appellons L'api pour recuperer la donné du produit grace a idProduct
-//modif faite au lieu de recup l'integralité de la base et de comparer
+//RECUPPERATION DONNEE DU PRODUIT VIA L'API GRACE A SON ID
+function getProductDetails(){
 fetch(`http://localhost:3000/api/products/${idProduct}`)
   .then(function(res) {
     if (res.ok){
@@ -61,98 +60,79 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
     }
   })
   .then(function(result){ 
-    console.log(result);
     addHTML(result);
     addColors(result.colors);
   })
-    //si erreur
     .catch (function(err) {
       console.log('Oups, je ne sais pas non plus ce qu il se passe');
   });
+}
 
-
-//verif des données fournit
-//ATTENTION en faite il faut utilisé des regex
-//EXEMPLE REGEX POUR LA COULEUR ( let reg = new RegExp(/S+V+P//) ) + signifie suivie directement de donc ici S suivie directement de V suivie diredtement de P
-const verifAddCart = (valueQuantity, valueColors) => { 
-  let 
-  if(valueColors == "" || valueQuantity>100 || valueQuantity<1 ){
+const checkAddCart = (valueQuantity, valueColors) => { 
+  let reg = new RegExp ('^([1-9]|[1-9][0-9]|100)$'); // '^' indique qu'il doit commencer par, '$' indique qu'il doit finir par et donc encadre le resultat voulu , etant donné qu'il ne peut commencer par "-" il ne peu etre négatif et etant donné qu'il doit terminer par un nombre il ne peu y avoir de virgule et est donc entier
+  if(valueColors == "" || reg.test(valueQuantity) == false ){
   return false;
   }else{
   return true;
   }
+};
+
+//SAUVEGARDE SUR LE LOCALSTORAGE
+function saveOnLocalStorage(){
+  let cartJSON = JSON.stringify(cart);
+  localStorage.setItem('cart', cartJSON); 
+  console.log(localStorage.cart)
 }
 
-// creation fonction sauvegarde les données sur local
-  const saveCart = () => {
-    // donnée de la couleur
-    let allColors = document.getElementById("colors");
-    let colorsChoose = allColors.options[allColors.selectedIndex].value;
-    //donnée de la quantité
-    let quantityChoose = document.getElementById("quantity").value;  // probleme pas un nombre
-    // Creation de la condition du formulaire valid
-    let validSend = true; // TEST 
+// SAUVEGARDE DU PRODUIT DANS LE PANIER ( du localStorage ) 
+const saveCart = () => {
   
-    //verif avant ajout carte
-    validSend = verifAddCart(quantityChoose, colorsChoose);
-    console.log(validSend);
+  let allColors = document.getElementById("colors");
+  let colorsChoose = allColors.options[allColors.selectedIndex].value;
+  let quantityChoose = document.getElementById("quantity").value; 
+  let validSend = true; 
 
- 
-    //GESTION VALIDATION DONNEES SAISIE
-
-      // annulatiojn du remplissage si: + message erreur
-      if(validSend == false){ 
-        //creation message erreur
-        errMsg.style.color = "red";
-        errMsg.textContent = "Veuillez selection une couleur et/ou une quantité" // voir pour afficher message d'erreur;
-        return 0;
-      }else{
-      errMsg.textContent='Article(s) ajouter au panier';
-      errMsg.style.color = "green";
-      }
-    //FIN GESTION VALIDATION DONNES SAISIE
-  
-    // DEBUT CONDITION CREATION NOUVELLE OBJ si PAS DE DOUBLONS sinon MODIF QUANTITE
-    newCartAdd = {
-      _id : idProduct,
-      colors : colorsChoose,
-      quantity : quantityChoose
-    };
-
-    let copyExist = false;
-
-    for(let i in cart){
-      console.log('err: ',cart[i]._id);
-      if(cart[i]._id == idProduct && cart[i].colors == colorsChoose ){
-        cart[i].quantity = parseInt(cart[i].quantity) + parseInt(quantityChoose);
-        console.log('nouvelle quantité : ', cart[i].quantity);
-        copyExist = true;
-      }
-    }
-
-    if(copyExist !== true){
-      cart.push(newCartAdd);
-    }
-    // FIN CONDITION DE REMPLISSAGE TABLEAU 
-
-    console.log('-------');
-    console.log(cart);
-    console.log('-------');
-    
-
-   let cartJSON = JSON.stringify(cart);
-   localStorage.setItem('cart', cartJSON); // ici si pas JSON peu pas LIRE le console.log
-   console.log(localStorage.cart)
-   console.log("tata", +localStorage.cartJSON);
+  validSend = checkAddCart(quantityChoose, colorsChoose);
+  if(validSend == false){  // Msg erreur return 0:
+    document.getElementById('error').style.color = "red";
+    document.getElementById('error').textContent = "Veuillez selection une couleur et/ou une quantité" // voir pour afficher message d'erreur;
+    return 0;
+  }else{
+    document.getElementById('error').textContent='Article(s) ajouter au panier';
+    document.getElementById('error').style.color = "green";
   }
- 
+
+  // DEBUT CONDITION CREATION NOUVELLE OBJ si PAS DE DOUBLONS sinon MODIF QUANTITE
+  let copyExist = false;
+  let NewCartAdd = {
+    _id : idProduct,
+    colors : colorsChoose,
+    quantity : quantityChoose
+  };
+
+  for(let i in cart){
+    if(cart[i]._id == idProduct && cart[i].colors == colorsChoose ){
+      cart[i].quantity = parseInt(cart[i].quantity) + parseInt(quantityChoose);
+      console.log('nouvelle quantité : ', cart[i].quantity);
+      copyExist = true;
+    }
+  }
+  if(copyExist !== true){
+    cart.push(NewCartAdd);
+  }
+  saveOnLocalStorage();
+};
+
+function main(){
+  checkStorage();
+  createErrContainer();
+  getIdInUrl();
+  getProductDetails();
+};
+
+main();
+
 //CREATION EVENEMENT ENVOI DONNEES AU LOCALSTORAGE
   document
     .getElementById('addToCart')
     .addEventListener('click',saveCart);
-// FIN CREATION EVENEMENT ENVOI DONNEES AU LOCALSTORAGE
-
-  //vérification des Elements fournis par l'utilisateur
-
-  // const RegexNumber =  / [1-100] / ; // interval 1 a 100
-  
