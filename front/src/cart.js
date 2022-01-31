@@ -4,11 +4,13 @@ let tab = [];
 let priceTotal = 0;
 let quantityTotal = 0;
 let validSend = true;
+let cartJSON, cart;
 
-// récuperation des données du localStorage
-let cartJSON = localStorage.getItem('cart');
-let cart = JSON.parse(cartJSON);
-
+//RECUPERATION DES DONNEES DU LOCALSTORAGE
+function getLocalStorage (){
+cartJSON = localStorage.getItem('cart');
+cart = JSON.parse(cartJSON);
+}
 
 //RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 async function getData(product){
@@ -19,15 +21,13 @@ async function getData(product){
   .catch (function(err) {
     console.log('Oups, je ne sais pas non plus ce qu il se passe!');
   });
-}
+};
 //FIN RECUPERATION DES DONNEES DANS L'API POUR LAFFICHAGE DES PRODUITS CONTENU DANS CART
 
 
 // CREATION ET AJOUT DE NOUVELLE ELEMENT
 const newElement = (tab1, tab2) => { 
-
               //CREATION DES ELEMENTS //
-
   let articleCartItem = document.createElement('article');
 
   let divCartItemImg = document.createElement('div');
@@ -48,9 +48,7 @@ const newElement = (tab1, tab2) => {
 
   let divCartItemContentSettingsDelete = document.createElement('div');
   let pCartItemContentSettingsDelete = document.createElement('p');
-
             // AJOUT AU HTML DES NOUVEAUX ELEMENTS // 
-  
   document.getElementById('cart__items').appendChild(articleCartItem);
   //
   articleCartItem.appendChild(divCartItemImg);
@@ -71,9 +69,7 @@ const newElement = (tab1, tab2) => {
   //
   divCartItemContentSettings.appendChild(divCartItemContentSettingsDelete);
   divCartItemContentSettingsDelete.appendChild(pCartItemContentSettingsDelete);
-  
                // AJOUT DE CLASSE(S) AUX ELEMENTS CRÉES // 
-
   articleCartItem.classList.add("cart__item");
   divCartItemImg.classList.add("cart__item__img");
   divCartItemContent.classList.add("cart__item__content");
@@ -83,9 +79,7 @@ const newElement = (tab1, tab2) => {
   inputCartItemContentSettingsQuantity.classList.add("itemQuantity");
   divCartItemContentSettingsDelete.classList.add("cart__item__content__settings__delete");
   pCartItemContentSettingsDelete.classList.add("deleteItem");
-
               // REMPLISSAGE AVEC LES VALEURS DU PRODUIT // 
-
   articleCartItem.setAttribute("data-id", tab1._id); // important pour le delete
   articleCartItem.setAttribute('data-color', tab2.colors);
   //
@@ -104,14 +98,11 @@ const newElement = (tab1, tab2) => {
   inputCartItemContentSettingsQuantity.setAttribute('max', '100');
   //
   pCartItemContentSettingsDelete.innerText='Supprimer';
-
                 // CREATION ELEMENT ERREUR //
-
   let errMsg = document.createElement("p");
   inputCartItemContentSettingsQuantity.parentElement.appendChild(errMsg);
-
                // AJOUT CREATION EVENT // ( fonctions d'evenements créer ici pour ne pas perdre les valeurs des pointeurs de balise HTML )
-  //-->              
+  //--> EVENT          
   pCartItemContentSettingsDelete.addEventListener('click', function(){
     priceTotal = 0; // important
     quantityTotal = 0; // pour le recalcul
@@ -123,7 +114,6 @@ const newElement = (tab1, tab2) => {
         document
           .getElementById('cart__items')
           .removeChild(parent);
-          console.log('nouvelle cart', cart);
       }
     }
     for(let i in cart){ // ne peut etre fait dans la boucle précédent car let i in cart prend pour valeur lancienne dimmension de cart
@@ -132,8 +122,7 @@ const newElement = (tab1, tab2) => {
   displayPrice();
   });
   //<--
-  //-->
-  console.log('tab valeur', tab);
+  //--> EVENT
   let newQuantity = inputCartItemContentSettingsQuantity;
   newQuantity.addEventListener('change', function(){
     newQuantity.innerText = newQuantity.value; 
@@ -151,41 +140,34 @@ const newElement = (tab1, tab2) => {
     for(let i in cart){
       if(parent.dataset.id == cart[i]._id && parent.dataset.color == cart[i].colors){
         cart[i].quantity = newQuantity.value;
-        console.log("nouvelle quantité", newQuantity.value);
         saveOnLocalStorage();
-        console.log('nouvelle cart', cart);
       }
       calculPricTotal(tab[i], cart[i]);
     }
     displayPrice();
   });
   //<--
-}
-// FIN DE CREATION ET AJOUT DE NOUVELLE ELEMENT
+};
 
 //FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
 function calculPricTotal(base, tab){
   priceTotal += ( parseInt(base.price)*(parseInt(tab.quantity)) );
   quantityTotal += parseInt(tab.quantity);
-}
-// FIN FONCTION POUR LE CALCUL DU PRIX TOTAL ET DE LA QUANTITE TOTAL
+};
 
 //VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
 const verifAddCart = (valueQuantity) => { 
   let rege = new RegExp ('^([1-9]|[1-9][0-9]|100)$'); // '^' indique qu'il doit commencer par, '$' indique qu'il doit finir par et donc encadre le resultat voulu , etant donné qu'il ne peut commencer par "-" il ne peu etre négatif et etant donné qu'il doit terminer par un nombre il ne peu y avoir de virgule et est donc entier
   return rege.test(valueQuantity); // return false/true
-}
-//FIN VERIFICATION DE LA QUANTITE FOURNIS PAR L'UTILISATEUR
+};
 
 //ENREGISTREMENT DE LA CART SUR LE LOCALSTORAGE
 const  saveOnLocalStorage = () =>{
   cartJSON = JSON.stringify(cart);
   localStorage.setItem('cart', cartJSON);
-  console.log("new local storage : ", localStorage.cart);
-}
-//FIN ENREGISTREMENT DE LA CART SUR LE LOCALSTORAGE
+};
 
-//CREATION FONCTION VERIFICATION FORMULAIRE
+//VERIFICATION DU FORMULAIRE
 function verifForm(){
   let formValid = true;
 
@@ -195,10 +177,9 @@ function verifForm(){
   let cityForm = document.getElementById('city').value;
   let emailForm = document.getElementById('email').value;
 
-
   let regexText = new RegExp('[a-zA-Z\- ]'); // uniquement lettre min ou maj ou '-'
   let regexTextChiffre = new RegExp('[a-zA-Z0-9\- ]'); // ATTENTION l'espace est volontaire pour autorisé les espaces
-  let regexEmail = new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"); // syntaxe recuperer https://www.w3resource.com/javascript/form/email-validation.php
+  let regexEmail = new RegExp("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"); //syntaxe recuperée: https://www.w3resource.com/javascript/form/email-validation.php
 
   if(regexText.test(firstNameForm) == false){
     document.getElementById('firstNameErrorMsg').innerText = 'Prénom non valide'; 
@@ -234,13 +215,11 @@ function verifForm(){
   if(formValid == false){ //SI L'UN DES ELEMENTS N'EST PAS BON ON RETOURNE 0;
     return 0;
   }
-
   createContactCard();
   createProctuctsArray();
   sendContactCard();
   moveToConfirmationPage();
-}
-//FIN CREATION FONCTION VERIFICATION FORMULAIRE
+};
 
 //CREATION CARTE CONTACT
 const createContactCard = () =>{ 
@@ -251,24 +230,19 @@ const createContactCard = () =>{
     city : document.getElementById('city').value,
     email : document.getElementById('email').value
   }
-  console.log('carte du contact : ', contact);
-}
-//FIN CREATION CARTE CONTACT
+};
 
 //CREATION DU TABLEAU DES PRODUITS A ENVOYER A L'API
 const createProctuctsArray = () => {
   for (let i in cart){ // model products dans back/controllers/product.js
     products[i] = cart[i]._id;  
   }
-  console.log('tableau produits a envoyer: ', products);
-}
-//CREATION DU TABLEAU DES PRODUITS A ENVOYER A L'API
+};
 
 //NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 const moveToConfirmationPage = (value) => {
   window.location = `./confirmation.html?orderId=${value}`
 }
-// FIN NOUS ENVOYER SUR LA PAGE DE CONFIRMATION
 
 //ENVOIE DE LA CARTE CONTACT ET DU PANIER A L'API
 const sendContactCard = () => {
@@ -289,16 +263,15 @@ const sendContactCard = () => {
       moveToConfirmationPage(value.orderId);
   });
 }
-//FIN ENVOIE DE LA CARTE CONTACT A L'API
 
 //AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
 function displayPrice(){
- console.log('price Tot: ',priceTotal, 'qte: ', quantityTotal);
  document.getElementById('totalQuantity').innerText = quantityTotal; 
  document.getElementById('totalPrice').innerText = priceTotal;
 }
-//FIN AFFICHAGE DU PRIX TOTAL ET DE LA QUANTITE
+
 async function main (){
+  getLocalStorage();
   for (let i in cart){
     tab[i] = await getData(cart[i]);
     newElement(tab[i], cart[i]);
@@ -315,7 +288,5 @@ document
     event.preventDefault();
     verifForm();
   });
-
-// FIN CREATION EVENEMENT COMMANDER
 
 

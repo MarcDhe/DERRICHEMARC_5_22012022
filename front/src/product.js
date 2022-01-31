@@ -47,7 +47,6 @@ const addColors = (array) => {
     document.getElementById("colors").appendChild(optionColor);
     optionColor.setAttribute("value", array[i]);
     optionColor.innerText = array[i];
-    console.log(array[i]);
   }
 }
 
@@ -81,7 +80,6 @@ const checkAddCart = (valueQuantity, valueColors) => {
 function saveOnLocalStorage(){
   let cartJSON = JSON.stringify(cart);
   localStorage.setItem('cart', cartJSON); 
-  console.log(localStorage.cart)
 }
 
 // SAUVEGARDE DU PRODUIT DANS LE PANIER ( du localStorage ) 
@@ -113,7 +111,6 @@ const saveCart = () => {
   for(let i in cart){
     if(cart[i]._id == idProduct && cart[i].colors == colorsChoose ){
       cart[i].quantity = parseInt(cart[i].quantity) + parseInt(quantityChoose);
-      console.log('nouvelle quantité : ', cart[i].quantity);
       copyExist = true;
     }
   }
