@@ -203,7 +203,11 @@ function verifForm(){
 
   if(formValid == false){ //SI L'UN DES ELEMENTS N'EST PAS BON ON RETOURNE 0;
     return 0;
-  }
+  };
+  if(checkCartStatus() == false){
+    return 0;
+  };
+
   createContactCard();
   createProctuctsArray();
   sendContactCard();
@@ -224,6 +228,20 @@ const createContactCard = () =>{
 const createProctuctsArray = () => {
   for (let i in cart){ // model products dans back/controllers/product.js
     products[i] = cart[i]._id;  
+  }
+};
+
+//CONTROLE DU NOMBRE DE PRODUIT(S) DANS LE PANIER
+function checkCartStatus(){
+  if(quantityTotal == 0){
+    let emptyCart = document.createElement('p');
+    let parentCart = document.getElementsByClassName('cart');
+    parentCart[0].appendChild(emptyCart);
+    emptyCart.innerText = 'Votre Panier est Vide !';
+    emptyCart.style.color = 'red';
+    return false;
+  }else{
+    return true;
   }
 };
 
@@ -251,9 +269,9 @@ const sendContactCard = () => {
     moveToConfirmationPage(value.orderId);
   });
 }
-
+//FONCTION PRINCIPAL
 async function main (){
-  getLocalStorage();
+  getLocalStorage(); 
   for (let i in cart){
     tab[i] = await getData(cart[i]);
     newElement(tab[i], cart[i]);

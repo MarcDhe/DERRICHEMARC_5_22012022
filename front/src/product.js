@@ -67,6 +67,7 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
   });
 }
 
+//CONTROLE QUANTITE ET COULEUR SELECTIONNÉES
 const checkAddCart = (valueQuantity, valueColors) => { 
   let reg = new RegExp ('^([1-9]|[1-9][0-9]|100)$'); // '^' indique qu'il doit commencer par, '$' indique qu'il doit finir par et donc encadre le resultat voulu , etant donné qu'il ne peut commencer par "-" il ne peu etre négatif et etant donné qu'il doit terminer par un nombre il ne peu y avoir de virgule et est donc entier
   if(valueColors == "" || reg.test(valueQuantity) == false ){
@@ -120,6 +121,7 @@ const saveCart = () => {
   saveOnLocalStorage();
 };
 
+// FONCTION PRINCIPAL
 function main(){
   checkStorage();
   createErrContainer();
