@@ -9,6 +9,11 @@ function checkStorage(){
   }
 }
 
+//ENVOI VERS LA PAGE D'ACCUEIL
+const moveToIndex = () => {
+  window.location = `./index.html`;
+}
+
 //CREE UN EMPLACEMENT DANS LE HTML POUR AFFICHER LES MESSAGGE D'ERREUR
 function createErrContainer(){
   let errMsg = document.createElement("p");
@@ -64,6 +69,7 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
   })
     .catch (function(err) {
       console.log('Oups, je ne sais pas non plus ce qu il se passe');
+      moveToIndex();
   });
 }
 

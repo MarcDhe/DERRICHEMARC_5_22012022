@@ -158,7 +158,8 @@ const  saveOnLocalStorage = () =>{
 };
 
 //VERIFICATION DU FORMULAIRE
-function verifForm(){
+function verifForm(event){
+  event.preventDefault();
   let formValid = true;
 
   let firstNameForm = document.getElementById('firstName').value;
@@ -285,9 +286,6 @@ main();
 // CREATION EVENEMENT COMMANDER
 document
   .getElementById('order')
-  .addEventListener('click',function(event){
-    event.preventDefault();
-    verifForm();
-  });
+  .addEventListener('click',verifForm ) // attention ici ne pas mettre de event en parametre sinon ne marche pas 
 
 
