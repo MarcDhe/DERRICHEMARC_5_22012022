@@ -240,6 +240,7 @@ function checkCartStatus(){
     parentCart[0].appendChild(emptyCart);
     emptyCart.innerText = 'Votre Panier est Vide !';
     emptyCart.style.color = 'red';
+    emptyCart.style.textAlign = "center";
     return false;
   }else{
     return true;
